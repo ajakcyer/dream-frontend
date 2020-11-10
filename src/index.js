@@ -86,11 +86,10 @@ function renderEntriesLinks({ entries }) {
 function renderComments(comments) {
   comments.forEach(async ({ comment, user_id }) => {
     let { username, name } = await fetchUser(user_id)
-    let user_name = createP(username)
-    let userName = createP(name)
+    let user_name = createP(`${username} ${name}`)
     let commentNode = createLi(comment);
     commentNode.classList.add('list-group-item')
-    commentList.append(commentNode, user_name, userName);
+    commentList.append(commentNode, user_name);
   });
 }
 
