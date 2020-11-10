@@ -38,3 +38,8 @@
 #other-links li:hover {
     background-color: aquamarine;
 }
+
+html {
+    margin-left: 2%;
+    margin-right: 2%;
+}

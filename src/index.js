@@ -5,13 +5,16 @@ let userInfoContainer = document.getElementById("user-info-container");
 let entriesLink = document.getElementById("entries-link");
 let publicLinks = document.getElementById("other-links");
 let commentList = document.getElementById('comment-list')
-
+let commentForm = document.getElementById('comment-form')
 // function to create elements with 'element' as argument and string you want inside element as 2nd argument.
 const createElements = (element) => (string) => {
   let node = document.createElement(element);
   node.innerText = string;
   return node;
 };
+
+const GLOBALID = (id) = () => id
+
 
 const createH1 = createElements("h1");
 const createH2 = createElements("h2");
@@ -85,13 +88,15 @@ function renderEntriesLinks({ entries }) {
 
 function renderComments(comments) {
   commentList.innerHTML = ""
-  comments.forEach(async ({ comment, user_id }) => {
+  comments.forEach(renderComment);
+}
+
+async function renderComment({ comment, user_id }) {
     let { username, name } = await fetchUser(user_id)
     let user_name = createP(`${username} ${name}`)
     let commentNode = createLi(comment);
     commentNode.classList.add('list-group-item')
     commentList.append(commentNode, user_name);
-  });
 }
 
 //rendering other user posts (public vs private not specified)
@@ -117,4 +122,14 @@ const appendLinksToPage = (entries) => {
   publicLinks.append(otherLinksUl);
 };
 
+
+const addComment = () => {
+    commentForm.addEventListener('submit', e => {
+        e.preventDefault()
+        renderComment({comment: document.getElementById('comment').value, user_id: 1})
+    })
+}
+
+
 logIn();
+addComment();
