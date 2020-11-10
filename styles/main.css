@@ -25,7 +25,16 @@
 }
 
 
-#other-links{
+#other-links {
     grid-area: allposts;
+}
+
+#other-links ul {
+    height: 200px;
+    overflow-y: scroll;
     scroll-behavior: auto;
+}
+
+#other-links li:hover {
+    background-color: aquamarine;
 }

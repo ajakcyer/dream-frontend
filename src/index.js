@@ -84,6 +84,7 @@ function renderEntriesLinks({ entries }) {
 }
 
 function renderComments(comments) {
+  commentList.innerHTML = ""
   comments.forEach(async ({ comment, user_id }) => {
     let { username, name } = await fetchUser(user_id)
     let user_name = createP(`${username} ${name}`)
@@ -104,7 +105,10 @@ const fetchAllEntries = (callBackFunc) => {
 
 const appendLinksToPage = (entries) => {
   const otherLinksUl = document.createElement("ul");
-  otherLinksUl.textContent = "Post by Other Users";
+  const createH5 = createElements("h5")
+  const heading = createH5("Post by Other Users");
+  // otherLinksUl.textContent = "Post by Other Users";
+  publicLinks.append(heading)
   entries.forEach((entry) => {
     const link = createLi("Other Post Title");
     link.addEventListener("click", () => renderEntry(entry));
