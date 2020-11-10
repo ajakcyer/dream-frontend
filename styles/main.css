@@ -1,28 +1,31 @@
 #main-container {
     display: grid;
-    /* /* grid-template-areas:
-    /* "header header header"
-    "myposts . post"
-    "allposts . post"
-    ; */  
+ grid-template-areas:
+    "header header"
+    "myposts  post"
+    "allposts  post";
     /* grid-template-columns: 30% auto;
     grid-template-rows: 25% auto; */
 }
 
 #user-info-container {
-    grid-area: header row1-start / first / row1-end / 2;
+    grid-area: header;
+    display: inline-flex;
+    background: cyan;
 
 }
 
 #entries-link {
-    grid-area: myposts row1-end / first / third-line / line2
+    grid-area: myposts ;
+
 }
 
 #entry-container {
-    grid-area: post 1 / col2-start / last-line
+    grid-area: post;
 }
+
 
 #other-links{
-    grid-area: allposts third-line / first / last-line / line2
+    grid-area: allposts;
+    scroll-behavior: auto;
 }
-
