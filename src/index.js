@@ -4,8 +4,15 @@ let entryContainer = document.getElementById("entry-container");
 let userInfoContainer = document.getElementById("user-info-container");
 let entriesLink = document.getElementById("entries-link");
 let publicLinks = document.getElementById("other-links");
-let commentList = document.getElementById('comment-list')
-let commentForm = document.getElementById('comment-form')
+let commentList = document.getElementById("comment-list");
+let commentForm = document.getElementById("comment-form");
+let config = {
+  method: "post",
+  headers: { "content-type": "application/json", accept: "application/json" },
+};
+
+
+var currentUser;
 // function to create elements with 'element' as argument and string you want inside element as 2nd argument.
 const createElements = (element) => (string) => {
   let node = document.createElement(element);
@@ -13,8 +20,7 @@ const createElements = (element) => (string) => {
   return node;
 };
 
-const GLOBALID = (id) = () => id
-
+const GLOBALID = (id = () => id);
 
 const createH1 = createElements("h1");
 const createH2 = createElements("h2");
@@ -23,23 +29,14 @@ const createButton = createElements("button");
 const createP = createElements("p");
 const createLi = createElements("li");
 
-async function logIn() {
-  let response = await fetch(`${url}/users/1`);
-
-  let data = await response.json();
-
-  renderUser(data);
-  renderEntriesLinks(data);
-  fetchAllEntries(appendLinksToPage);
-}
-
 //places THIS user's info data on page
 function renderUser(data) {
   let userName = createH1(data.username);
   let name = createH2(data.name);
   let age = createH2(`Age: ${data.age}`);
   userInfoContainer.append(userName, name, age);
-  renderEntry(data.entries[0]);
+  console.log(data.entries);
+  if (data.entries.length > 0) renderEntry(data.entries[0]);
 }
 
 async function fetchUser(id) {
@@ -54,16 +51,19 @@ async function fetchEntriesComments(id) {
 }
 
 // loads new post on THIS page when a different post is clicked
-async function renderEntry({ description, id, user_id }) {
-  let {username, name} = await fetchUser(user_id)
+async function renderEntry({ title, description, id, user_id }) {
+  let { username, name } = await fetchUser(user_id);
   let comments = await fetchEntriesComments(id);
-  let [title, text, button] = entryContainer.querySelector('.card-body').querySelectorAll('.node')
-  title.innerText = `My Title: By ${name} Follow ${username}`
-  text.innerText = description
+  let [titleNode, text, button] = entryContainer
+    .querySelector(".card-body")
+    .querySelectorAll(".node");
+  titleNode.innerText = `${title}: By ${name} Follow ${username}`;
+  text.innerText = description;
   //button add event to go public
-  renderComments(comments) 
-}
 
+  //create data set for entry - override 
+  renderComments(comments);
+}
 
 // let userName = createH3(user.username)
 // let name = createH3(user.name)
@@ -78,7 +78,7 @@ function renderEntriesLinks({ entries }) {
   myPosts.textContent = "My Posts";
   entriesLink.append(myPosts);
   entries.forEach((entry) => {
-    let entryButton = createP("My Title");
+    let entryButton = createP(entry.title);
     entryButton.addEventListener("click", () => {
       renderEntry(entry);
     });
@@ -87,16 +87,16 @@ function renderEntriesLinks({ entries }) {
 }
 
 function renderComments(comments) {
-  commentList.innerHTML = ""
+  commentList.innerHTML = "";
   comments.forEach(renderComment);
 }
 
 async function renderComment({ comment, user_id }) {
-    let { username, name } = await fetchUser(user_id)
-    let user_name = createP(`${username} ${name}`)
-    let commentNode = createLi(comment);
-    commentNode.classList.add('list-group-item')
-    commentList.append(commentNode, user_name);
+  let { username, name } = await fetchUser(user_id);
+  let user_name = createP(`${username} ${name}`);
+  let commentNode = createLi(comment);
+  commentNode.classList.add("list-group-item");
+  commentList.append(commentNode, user_name);
 }
 
 //rendering other user posts (public vs private not specified)
@@ -110,26 +110,39 @@ const fetchAllEntries = (callBackFunc) => {
 
 const appendLinksToPage = (entries) => {
   const otherLinksUl = document.createElement("ul");
-  const createH5 = createElements("h5")
-  const heading = createH5("Post by Other Users");
   // otherLinksUl.textContent = "Post by Other Users";
-  publicLinks.append(heading)
   entries.forEach((entry) => {
-    const link = createLi("Other Post Title");
+    const link = createLi(entry.title);
     link.addEventListener("click", () => renderEntry(entry));
     otherLinksUl.append(link);
   });
   publicLinks.append(otherLinksUl);
 };
 
+const addComment = ({ id }) => {
+  commentForm.addEventListener("submit", async (e) => {
+      // query for data set connected to current entry
+    e.preventDefault();
+    // let post = fetch(`${url}comments`, {config, body: JSON.stringify({comment: document.getElementById('comment').value, user_id: id})});
+    renderComment({
+      comment: document.getElementById("comment").value,
+      user_id: id,
+    });
+  });
+};
 
-const addComment = () => {
-    commentForm.addEventListener('submit', e => {
-        e.preventDefault()
-        renderComment({comment: document.getElementById('comment').value, user_id: 1})
-    })
+async function logIn() {
+  let response = await fetch(`${url}/users/2`);
+  let data = await response.json();
+  currentUser = returnUser(data);
+  renderUser(data);
+  renderEntriesLinks(data);
+  fetchAllEntries(appendLinksToPage);
+  addComment(data);
 }
 
+function returnUser(user) {
+  return user;
+}
 
 logIn();
-addComment();

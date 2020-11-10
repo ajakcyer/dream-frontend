@@ -14,13 +14,14 @@
   </head>
   <body>
     <ul class="nav nav-tabs">
-       
-        <li class="nav-item">
-          <a class="nav-link" href="login.html">Log Out</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-      </ul>    
+      <li class="nav-item">
+        <a class="nav-link" href="login.html">Log Out</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+    </ul>
+
     <div id="main-container">
       <div id="user-info-container"></div>
       <div id="entries-link"></div>
@@ -31,21 +32,24 @@
           <p class="card-text node"></p>
           <a href="#" class="btn btn-primary node">Go Public</a>
 
-  <hr>
-  <br>
-  <hr>
-                <form id = 'comment-form'>
-                    <div class="form-group">
-                      <textarea class="form-control" id = 'comment'  rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary mb-2">Add comment</button>
-    
-                </form>
-                    <ul id="comment-list" class="list-group list-group-flush"></ul>
-                </div>
-
+          <hr />
+          <br />
+          <hr />
+          <form id="comment-form">
+            <div class="form-group">
+              <textarea class="form-control" id="comment" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">
+              Add comment
+            </button>
+          </form>
+          <ul id="comment-list" class="list-group list-group-flush"></ul>
         </div>
-      <div id="other-links"></div>
+      </div>
+      <div id="other-links">
+          <h5>Explore Public Post!</h5>
+          <br>
+      </div>
     </div>
     <script
       src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
