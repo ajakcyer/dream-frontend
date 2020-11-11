@@ -2,31 +2,29 @@ let url = "http://localhost:3000/api/v1/";
 
 let signupForm = document.getElementById("signup-form");
 
-signupForm.addEventListener("submit", async (e) => {
+signupForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  let [
-    name,
-    username,
-    age,
-    password,
-    confirmPass,
-  ] = signupForm.querySelectorAll(".val");
-  let opts = {
-    name: name.value,
-    age: age.value,
-    username: username.value,
-    password: password.value,
-    password_confirmation: confirmPass.value
+
+  const userObj = {
+    name: signupForm.InputName.value,
+    username: signupForm.InputUserName.value,
+    age: signupForm.InputAge.value,
+    password: signupForm.InputPassword.value
   }
 
-  let post = await fetch(`${url}users`, {
-    method: "post",
-    headers: { "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify(opts),
-  });
+  const userObjConfig = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(userObj)
+  }
 
-  let data = await post.json();
-  console.log(data);
+  fetch(`${url}users`, userObjConfig)
+  .then(r=>r.json())
+  .then(console.log)
+
 });
 
-async function createNewUser() {}
+// async function createNewUser() {}

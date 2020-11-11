@@ -31,11 +31,12 @@ const createLi = createElements("li");
 
 //places THIS user's info data on page
 function renderUser(data) {
+  userInfoContainer.innerHTML = ""
   let userName = createH1(data.username);
   let name = createH2(data.name);
   let age = createH2(`Age: ${data.age}`);
   userInfoContainer.append(userName, name, age);
-  console.log(data.entries);
+  // console.log(data.entries);
   if (data.entries.length > 0) renderEntry(data.entries[0]);
 }
 
@@ -74,6 +75,7 @@ async function renderEntry({ title, description, id, user_id }) {
 
 // fetches THIS user's posts and links them as buttons
 function renderEntriesLinks({ entries }) {
+  entriesLink.innerHTML = ""
   const myPosts = document.createElement("h3");
   myPosts.textContent = "My Posts";
   entriesLink.append(myPosts);
@@ -109,6 +111,9 @@ const fetchAllEntries = (callBackFunc) => {
 };
 
 const appendLinksToPage = (entries) => {
+  publicLinks.innerHTML = ""
+  const explore = document.createElement('h5')
+    explore.textContent = "Explore Public Post!"
   const otherLinksUl = document.createElement("ul");
   // otherLinksUl.textContent = "Post by Other Users";
   entries.forEach((entry) => {
@@ -116,7 +121,7 @@ const appendLinksToPage = (entries) => {
     link.addEventListener("click", () => renderEntry(entry));
     otherLinksUl.append(link);
   });
-  publicLinks.append(otherLinksUl);
+  publicLinks.append(explore, otherLinksUl);
 };
 
 const addComment = ({ id }) => {
@@ -131,18 +136,143 @@ const addComment = ({ id }) => {
   });
 };
 
-async function logIn() {
-  let response = await fetch(`${url}/users/2`);
-  let data = await response.json();
-  currentUser = returnUser(data);
-  renderUser(data);
-  renderEntriesLinks(data);
-  fetchAllEntries(appendLinksToPage);
-  addComment(data);
+function logIn(id) {
+  fetch(`${url}/users/${id}`)
+  .then(r=>r.json())
+  .then(data=>{
+    // currentUser = returnUser(data);
+    renderUser(data);
+    renderEntriesLinks(data);
+    fetchAllEntries(appendLinksToPage);
+    addComment(data);
+  })
 }
 
 function returnUser(user) {
   return user;
 }
 
-logIn();
+
+
+/// LOG IN + SIGN UP + LOG OUT VARIABLES ///
+const logInLink = document.querySelector('.login-link')
+const logInDom = document.querySelector('.login-options')
+const signupLink = logInDom.querySelector('.signup-link')
+const loginForm = logInDom.querySelector('form')
+const logoutLink = document.querySelector('.logout')
+
+/////// SIGNUP SECTION //////
+
+let currentLoggedInUserId;
+const signUpDom = document.querySelector('.sign-up-options')
+const loggedInDom = document.querySelector('.logged-in-options')
+  loggedInDom.style.display = "none"
+
+let signupForm = document.getElementById("signup-form");
+
+signupForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  // user body from signup form
+  const userObj = {
+    name: signupForm.InputName.value,
+    username: signupForm.InputUserName.value,
+    age: signupForm.InputAge.value,
+    password: signupForm.InputPassword.value
+  }
+
+  const userObjConfig = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(userObj)
+  }
+
+  fetch(`${url}users`, userObjConfig)
+  .then(r=>r.json())
+  .then(newUser => {
+    currentLoggedInUserId = newUser.id
+    signUpDom.style.display = "none"
+    // debugger
+    // render your first entry (if you ha)
+    logIn(currentLoggedInUserId)
+    //reveal the page with the entries
+    loggedInDom.style.display = ""
+
+  })
+});
+
+//// LOG IN SECTION ///
+
+signupLink.addEventListener('click', (e)=>{
+  e.preventDefault()
+  signUpDom.style.display = ""
+  logInDom.style.display = "none"
+})
+
+logInLink.addEventListener('click', (e)=>{
+  e.preventDefault()
+  signUpDom.style.display = "none"
+  logInDom.style.display = ""
+} )
+
+
+loginForm.addEventListener('submit', (e)=>{
+  e.preventDefault()
+
+  const getLoggedUser = {
+    username: loginForm['log-in-username'].value,
+    password: loginForm['log-in-password'].value
+  }
+
+  const userConfig = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(getLoggedUser)
+  }
+
+  const logInOrNot = (user) =>{
+    if (JSON.stringify(user) == "{}"){
+      console.log("incorrect password try again")
+    } else {
+      // console.log("correct password", user)
+      currentLoggedInUserId = user.id
+
+      //function to log in with user id argument
+      logIn(currentLoggedInUserId)
+
+      // hide log in form
+      logInDom.style.display = "none"
+
+      // reveal main content after logging in
+      loggedInDom.style.display = ""
+    }
+  }
+
+  fetch(`${url}logs`, userConfig)
+  .then(r=>r.json())
+  .then(logInOrNot)
+
+})
+
+
+///// LOG OUT SECTION ///
+
+logoutLink.addEventListener('click', (e)=>{
+  e.preventDefault()
+  // hide log in form
+  logInDom.style.display = ""
+  currentLoggedInUserId = ""
+  console.log(currentLoggedInUserId)
+  // reveal main content after logging in
+  // loggedInDom.textContent = ""
+  loggedInDom.style.display = "none"
+})
+
+
+// logIn();
