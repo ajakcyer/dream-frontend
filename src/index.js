@@ -125,14 +125,19 @@ const appendLinksToPage = (entries) => {
 };
 
 const addComment = ({ id }) => {
+  // debugger
   commentForm.addEventListener("submit", async (e) => {
-      // query for data set connected to current entry
-    e.preventDefault();
-    // let post = fetch(`${url}comments`, {config, body: JSON.stringify({comment: document.getElementById('comment').value, user_id: id})});
-    renderComment({
-      comment: document.getElementById("comment").value,
-      user_id: id,
-    });
+    if (id === currentLoggedInUserId){
+      // debugger
+        // query for data set connected to current entry
+      e.preventDefault();
+      // let post = fetch(`${url}comments`, {config, body: JSON.stringify({comment: document.getElementById('comment').value, user_id: id})});
+      renderComment({
+        comment: document.getElementById("comment").value,
+        user_id: id,
+      });
+      
+    }
   });
 };
 
@@ -140,7 +145,7 @@ function logIn(id) {
   fetch(`${url}/users/${id}`)
   .then(r=>r.json())
   .then(data=>{
-    // currentUser = returnUser(data);
+    // commentForm.removeEventListener('submit', ()=>{})
     renderUser(data);
     renderEntriesLinks(data);
     fetchAllEntries(appendLinksToPage);
@@ -265,12 +270,26 @@ loginForm.addEventListener('submit', (e)=>{
 
 logoutLink.addEventListener('click', (e)=>{
   e.preventDefault()
+
+  // removing previously logged in user info from DOM
+  const cardbodyH5 = document.querySelector('.card-body').querySelector('h5')
+  const cardbodyP = document.querySelector('.card-body').querySelector('p')
+  cardbodyH5.innerHTML = ""
+  cardbodyP.innerHTML = ""
+  userInfoContainer.innerHTML = ""
+  entriesLink.innerHTML = ""
+  publicLinks.innerHTML = ""
+
+
+
   // hide log in form
   logInDom.style.display = ""
   currentLoggedInUserId = ""
+
   console.log(currentLoggedInUserId)
   // reveal main content after logging in
   // loggedInDom.textContent = ""
+  // debugger
   loggedInDom.style.display = "none"
 })
 
