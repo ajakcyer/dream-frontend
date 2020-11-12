@@ -74,7 +74,7 @@ const makePublicFetch =(entryIdNum) =>{
 ///event listener conditionals for buttons on user's entry
 const userBtnEvents = (userBtns, id) =>{
   const entryIdNum = id
-  debugger
+  // debugger
   userBtns.addEventListener('click', (e)=>{
     e.preventDefault()
     if (e.target.matches('.make-public')){
@@ -94,7 +94,7 @@ const userBtnEvents = (userBtns, id) =>{
 //button showing conditional statement
 const thisUserEntry = (user_id, id) => {
   const userBtns = document.querySelector('.user-btns')
-  if (currentLoggedInUserId == user_id){
+  if (sessionStorage.getItem('user_id') == user_id){
     userBtns.style.display = ""
     userBtnEvents(userBtns, id)
   } else {
@@ -185,7 +185,7 @@ const appendLinksToPage = (entries) => {
 const addComment = ({ id }) => {
   // debugger
   commentForm.addEventListener("submit", async (e) => {
-    if (id === currentLoggedInUserId){
+    if (id === sessionStorage.getItem('user_id')){
       // debugger
         // query for data set connected to current entry
 
@@ -222,7 +222,7 @@ const logoutLink = document.querySelector('.logout')
 
 /////// SIGNUP SECTION //////
 
-let currentLoggedInUserId;
+// let sessionStorage.getItem('user_id');
 const signUpDom = document.querySelector('.sign-up-options')
 const loggedInDom = document.querySelector('.logged-in-options')
   loggedInDom.style.display = "none"
@@ -252,11 +252,11 @@ signupForm.addEventListener("submit", (e) => {
   fetch(`${url}users`, userObjConfig)
   .then(r=>r.json())
   .then(newUser => {
-    currentLoggedInUserId = newUser.id
+    // sessionStorage.getItem('user_id') = newUser.id
     signUpDom.style.display = "none"
     // debugger
     // render your first entry (if you ha)
-    logIn(currentLoggedInUserId)
+    logIn(sessionStorage.getItem('user_id'))
 
   }).then(saveUserSession)
 
@@ -299,10 +299,10 @@ loginForm.addEventListener('submit', (e)=>{
       console.log("incorrect password try again")
     } else {
       // console.log("correct password", user)
-      currentLoggedInUserId = user.id
+      // sessionStorage.getItem('user_id') = user.id
 
       //function to log in with user id argument
-      logIn(currentLoggedInUserId)
+      logIn(sessionStorage.getItem('user_id'))
 
       // hide log in form
       logInDom.style.display = "none"
@@ -323,6 +323,7 @@ loginForm.addEventListener('submit', (e)=>{
 ///// LOG OUT SECTION ///
 
 logoutLink.addEventListener('click', (e)=>{
+  // debugger
   e.preventDefault()
 
   // removing previously logged in user info from DOM
@@ -341,22 +342,26 @@ logoutLink.addEventListener('click', (e)=>{
 
   // hide log in form
   logInDom.style.display = ""
-  currentLoggedInUserId = ""
+  // sessionStorage.getItem('user_id') = ""
 
-  console.log(currentLoggedInUserId)
+  console.log(sessionStorage.getItem('user_id'))
   // reveal main content after logging in
   // loggedInDom.textContent = ""
   // debugger
   loggedInDom.style.display = "none"
+  logInDom.style.display = "none"
+  // debugger
+  signUpDom.style.display = ""
+
 })
 
-function openForm() {
-  document.getElementById("myForm").style.display = "block";
-}
+// function openForm() {
+//   document.getElementById("myForm").style.display = "block";
+// }
 
-function closeForm() {
-  document.getElementById("myForm").style.display = "none";
-}
+// function closeForm() {
+//   document.getElementById("myForm").style.display = "none";
+// }
 
 
 /////// CREATE A POST SECTION!!! //////
@@ -425,7 +430,7 @@ postForm.addEventListener('submit', (e)=>{
 
   const postTitle = postForm['post-title'].value
   const postDesc = postForm['post-desc'].value
-  const thisUser = currentLoggedInUserId
+  const thisUser = sessionStorage.getItem('user_id')
   const publicPost = postForm.public.checked
 
   
@@ -508,7 +513,7 @@ function logIn(id) {
 function init() {
     let id = sessionStorage.getItem('user_id')
     if(id) {
-        signupForm.style.display = 'none'
+        // signupDom.style.display = 'none'
         loginForm.style.display = 'none'
         logInDom.style.display = "none"
         signUpDom.style.display = "none"
