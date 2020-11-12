@@ -59,7 +59,6 @@ async function fetchEntriesComments(id) {
 
 const thisUserEntry = (user_id) => {
   const hrTag = document.querySelector('.line')
-  debugger
   if (currentLoggedInUserId == user_id){
     const div = document.createElement('div')
       div.classList.add('node', 'user-btns')
@@ -69,7 +68,6 @@ const thisUserEntry = (user_id) => {
     hrTag.insertBefore(div)
   }
 }
-
 
 // loads new post on THIS page when a different post is clicked
 async function renderEntry({ title, description, id, user_id }) {
@@ -173,17 +171,7 @@ const addComment = ({ id }) => {
   });
 };
 
-function logIn(id) {
-  fetch(`${url}/users/${id}`)
-  .then(r=>r.json())
-  .then(data=>{
-    // commentForm.removeEventListener('submit', ()=>{})
-    renderUser(data);
-    renderEntriesLinks(data);
-    fetchAllEntries(appendLinksToPage);
-    addComment(data);
-  })
-}
+
 
 function returnUser(user) {
   return user;
@@ -235,10 +223,9 @@ signupForm.addEventListener("submit", (e) => {
     // debugger
     // render your first entry (if you ha)
     logIn(currentLoggedInUserId)
-    //reveal the page with the entries
-    loggedInDom.style.display = ""
 
-  })
+  }).then(saveUserSession)
+
 });
 
 //// LOG IN SECTION ///
@@ -286,16 +273,17 @@ loginForm.addEventListener('submit', (e)=>{
       // hide log in form
       logInDom.style.display = "none"
 
-      // reveal main content after logging in
-      loggedInDom.style.display = ""
+
+    return user
     }
   }
 
-  fetch(`${url}logs`, userConfig)
-  .then(r=>r.json())
-  .then(logInOrNot)
+   fetch(`${url}logs`, userConfig)
+   .then(r=>r.json())
+   .then(logInOrNot)
+   .then(saveUserSession)
 
-})
+ })
 
 
 ///// LOG OUT SECTION ///
@@ -366,7 +354,7 @@ addPostBtn.addEventListener('click', (e)=>{
 
 
 // new entry functions to slap to DOM with event listeners
-const newEntryFunc = (newEntry) =>{
+const newEntryFunc = (newEntry) => {
   //initial render entry after submitting form
   renderEntry(newEntry)
   const newEntryTitle = newEntry.title
@@ -462,4 +450,36 @@ const deletePostBtn = document.querySelector('.delete-post')
 // })
 
 
+function saveUserSession({id}) {
+       sessionStorage.setItem('user_id', id)
+}
 //// END //////
+
+function logIn(id) {
+    // reveal main content after logging in
+    loggedInDom.style.display = "" //visible
+    console.log(id)
+    fetch(`${url}/users/${id}`)
+    .then(r=>r.json())
+    .then(data=>{
+      // commentForm.removeEventListener('submit', ()=>{})
+      renderUser(data);
+      renderEntriesLinks(data);
+      fetchAllEntries(appendLinksToPage);
+      addComment(data);
+    })
+  }
+
+
+function init() {
+    let id = sessionStorage.getItem('user_id')
+    if(id) {
+        signupForm.style.display = 'none'
+        loginForm.style.display = 'none'
+        logInDom.style.display = "none"
+        signUpDom.style.display = "none"
+        logIn(id)
+    }
+}
+
+init()
