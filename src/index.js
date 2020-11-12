@@ -137,7 +137,7 @@ const fetchAllEntries = (callBackFunc) => {
 const appendLinksToPage = (entries) => {
   publicLinks.innerText = ""
   const explore = document.createElement('h5')
-    explore.textContent = "Explore Public Post!"
+  explore.textContent = "Explore Public Post!"
   const otherLinksUl = document.createElement("ul");
   // otherLinksUl.textContent = "Post by Other Users";
   entries.forEach((entry) => {
@@ -207,11 +207,7 @@ signupForm.addEventListener("submit", (e) => {
   }
 
   const userObjConfig = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
+    ...config,
     body: JSON.stringify(userObj)
   }
 
@@ -252,11 +248,7 @@ loginForm.addEventListener('submit', (e)=>{
   }
 
   const userConfig = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
+    ...config,
     body: JSON.stringify(getLoggedUser)
   }
 
@@ -403,11 +395,7 @@ postForm.addEventListener('submit', (e)=>{
   }
   
   const newPostConfig = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
+   ...config,
     body: JSON.stringify(newPostObj)
   }
   
@@ -454,6 +442,7 @@ function saveUserSession({id}) {
        sessionStorage.setItem('user_id', id)
 }
 //// END //////
+
 
 function logIn(id) {
     // reveal main content after logging in
