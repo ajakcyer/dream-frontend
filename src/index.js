@@ -53,19 +53,52 @@ async function fetchEntriesComments(id) {
 }
 
 
+const makePublicFetch =(entryIdNum) =>{
+
+  const makePublicConfig = {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({public: 'true'})
+  }
+
+  fetch(`${url}entries/${entryIdNum}`, makePublicConfig)
+  .then(r=>r.json())
+  .then(console.log)
+}
 
 
-///event listener for buttons on user's entry
 
-const thisUserEntry = (user_id) => {
-  const hrTag = document.querySelector('.line')
+///event listener conditionals for buttons on user's entry
+const userBtnEvents = (userBtns, id) =>{
+  const entryIdNum = id
+  debugger
+  userBtns.addEventListener('click', (e)=>{
+    e.preventDefault()
+    if (e.target.matches('.make-public')){
+      console.log("make public clicked")
+      ///make public patch fetch request function
+    } else if (e.target.matches('.edit-post')){
+      console.log("edit post clicked")
+      ///edit post patch fetch request function
+    } else if (e.target.matches('.delete-post')){
+      console.log("delete button clicked")
+      /// delete post delete fetch request function
+    }
+  })
+}
+
+
+//button showing conditional statement
+const thisUserEntry = (user_id, id) => {
+  const userBtns = document.querySelector('.user-btns')
   if (currentLoggedInUserId == user_id){
-    const div = document.createElement('div')
-      div.classList.add('node', 'user-btns')
-      div.innerHTML = `<a href="#" class="btn btn-primary node make-public">Go Public</a>
-      <a href="#" class="btn btn-secondary node edit-post">Edit Post</a>
-      <a href="#" class="btn btn-danger node delete-post">Delete Post</a>`
-    hrTag.insertBefore(div)
+    userBtns.style.display = ""
+    userBtnEvents(userBtns, id)
+  } else {
+    userBtns.style.display = "none"
   }
 }
 
@@ -82,7 +115,8 @@ async function renderEntry({ title, description, id, user_id }) {
   text.innerText = description;
   //button add event to go public / edit post / delete post
   /// function name here ///
-  thisUserEntry(user_id)
+  thisUserEntry(user_id, id)
+  // debugger
 
   //create data set for entry - override 
   renderComments(comments);
