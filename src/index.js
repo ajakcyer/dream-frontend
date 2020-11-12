@@ -66,22 +66,29 @@ const makePublicFetch = (entryIdNum) => {
 };
 
 ///event listener conditionals for buttons on user's entry
-const userBtnEvents = (userBtns, id) => {
+const userBtnEvents = (userBtns, id, user_id) => {
   const entryIdNum = id;
   // debugger
+  
   userBtns.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (e.target.matches(".make-public")) {
-      console.log("make public clicked");
-      ///make public patch fetch request function
-    } else if (e.target.matches(".edit-post")) {
-      console.log("edit post clicked");
-      ///edit post patch fetch request function
-    } else if (e.target.matches(".delete-post")) {
-      console.log("delete button clicked");
-      /// delete post delete fetch request function
-    }
-  });
+  if (user_id == sessionStorage.getItem("user_id")) {
+      e.preventDefault();
+      if (e.target.matches(".make-public")) {
+        console.log("make public clicked");
+  
+        makePublicFetch(entryIdNum)
+  
+        ///make public patch fetch request function
+      } else if (e.target.matches(".edit-post")) {
+        console.log("edit post clicked");
+        ///edit post patch fetch request function
+      } else if (e.target.matches(".delete-post")) {
+        console.log("delete button clicked");
+        /// delete post delete fetch request function
+      }
+    }}
+  );
+
 };
 
 //button showing conditional statement
@@ -89,7 +96,7 @@ const thisUserEntry = (user_id, id) => {
   const userBtns = document.querySelector(".user-btns");
   if (sessionStorage.getItem("user_id") == user_id) {
     userBtns.style.display = "";
-    userBtnEvents(userBtns, id);
+    userBtnEvents(userBtns, id, user_id);
   } else {
     userBtns.style.display = "none";
   }
