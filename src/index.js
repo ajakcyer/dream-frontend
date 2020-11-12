@@ -57,6 +57,7 @@ async function renderEntry({ title, description, id, user_id }) {
   let { username, name } = await fetchUser(user_id);
   let comments = await fetchEntriesComments(id);
   entryContainer.dataset.entryId = id
+  entryContainer.dataset.userId = user_id
   let [titleNode, text, button] = entryContainer
     .querySelector(".card-body")
     .querySelectorAll(".node");
@@ -82,7 +83,6 @@ function renderEntriesLinks({ entries }) {
   const myPosts = document.createElement("h3");
   myPosts.textContent = "My Posts";
   myEntriesDiv.append(myPosts);
-  debugger
   entries.forEach((entry) => {
     let entryLink = createP(entry.title);
     entryLink.addEventListener("click", () => {
@@ -283,8 +283,8 @@ logoutLink.addEventListener('click', (e)=>{
   e.preventDefault()
 
   // removing previously logged in user info from DOM
-  const cardbodyH5 = document.querySelector('.card-body').querySelector('h5')
-  const cardbodyP = document.querySelector('.card-body').querySelector('p')
+  const cardbodyH5 = entryContainer.querySelector('h5')
+  const cardbodyP = entryContainer.querySelector('p')
   cardbodyH5.innerText = ""
   cardbodyP.innerText = ""
   userInfoContainer.innerText = ""
@@ -306,6 +306,108 @@ logoutLink.addEventListener('click', (e)=>{
   // debugger
   loggedInDom.style.display = "none"
 })
+
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+
+
+// CREATE A POST SECTION!!!
+
+// Variables
+
+const addPostBtn = document.querySelector('.add-post')
+const entryCard = document.querySelector('#entry-container')
+const postFormDiv = document.querySelector('.myForm')
+const postForm = postFormDiv.querySelector('form')
+
+// event listener on add post btn to open a form for new post
+addPostBtn.addEventListener('click', (e)=>{
+  e.preventDefault()
+
+  if (addPostBtn.innerText == "Cancel"){
+    addPostBtn.innerText = "Add New Post"
+    entryCard.style.display = ""
+    postFormDiv.style.display = "none"
+    console.log("entry shown again and button should go back to normal")
+  } else {
+    addPostBtn.innerText = "Cancel"
+    entryCard.style.display = "none"
+    postFormDiv.style.display = ""
+    console.log("display form here and post button name change")
+
+  }
+})
+
+// event listener for submitting new post
+
+const newEntryFunc = (newEntry) =>{
+  //initial render entry after submitting form
+  renderEntry(newEntry)
+  const newEntryTitle = newEntry.title
+
+  // append as p tag to MY post list
+    // if no div section in my entriesLink create one and add it
+  const newEntryTitleP = createP(newEntryTitle)
+
+  myEntriesDiv.append(newEntryTitleP)
+
+  //listener for new entry added to render form when clicked later
+  newEntryTitleP.addEventListener("click", () => {
+    renderEntry(newEntry);
+  });
+
+  //append as li to ALL post list
+  const otherLinksUl = publicLinks.querySelector('ul')
+  const link = createLi(newEntryTitle);
+  link.addEventListener("click", () => renderEntry(newEntry))
+  otherLinksUl.append(link)
+
+  //hide post form and reset contents if successful
+  postForm.reset()
+  addPostBtn.innerText = "Add New Post"
+  entryCard.style.display = ""
+  postFormDiv.style.display = "none"
+  console.log("entry shown again and button should go back to normal")
+}
+
+postForm.addEventListener('submit', (e)=>{
+  e.preventDefault()
+
+  const postTitle = postForm['post-title'].value
+  const postDesc = postForm['post-desc'].value
+  const thisUser = currentLoggedInUserId
+  const publicPost = postForm.public.checked
+
+  
+  const newPostObj = {
+    title: postTitle,
+    description: postDesc,
+    user_id: thisUser,
+    public: publicPost
+  }
+  
+  const newPostConfig = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(newPostObj)
+  }
+  
+  fetch(`${url}entries`, newPostConfig)
+  .then(r=>r.json())
+  .then(newEntryFunc)
+
+  // debugger
+})
+
+
 
 
 // logIn();
