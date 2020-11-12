@@ -6,8 +6,9 @@ let entriesLink = document.getElementById("entries-link");
 let publicLinks = document.getElementById("other-links");
 let commentList = document.getElementById("comment-list");
 let commentForm = document.getElementById("comment-form");
+let myEntriesDiv = document.createElement('div')
 let config = {
-  method: "post",
+  method: "POST",
   headers: { "content-type": "application/json", accept: "application/json" },
 };
 
@@ -31,7 +32,7 @@ const createLi = createElements("li");
 
 //places THIS user's info data on page
 function renderUser(data) {
-  userInfoContainer.innerHTML = ""
+  userInfoContainer.innerText = ""
   let userName = createH1(data.username);
   let name = createH2(data.name);
   let age = createH2(`Age: ${data.age}`);
@@ -55,6 +56,7 @@ async function fetchEntriesComments(id) {
 async function renderEntry({ title, description, id, user_id }) {
   let { username, name } = await fetchUser(user_id);
   let comments = await fetchEntriesComments(id);
+  entryContainer.dataset.entryId = id
   let [titleNode, text, button] = entryContainer
     .querySelector(".card-body")
     .querySelectorAll(".node");
@@ -75,21 +77,24 @@ async function renderEntry({ title, description, id, user_id }) {
 
 // fetches THIS user's posts and links them as buttons
 function renderEntriesLinks({ entries }) {
-  entriesLink.innerHTML = ""
+  // entriesLink.innerText = ""
+  // const modalBtn = document.createElement
   const myPosts = document.createElement("h3");
   myPosts.textContent = "My Posts";
-  entriesLink.append(myPosts);
+  myEntriesDiv.append(myPosts);
+  debugger
   entries.forEach((entry) => {
-    let entryButton = createP(entry.title);
-    entryButton.addEventListener("click", () => {
+    let entryLink = createP(entry.title);
+    entryLink.addEventListener("click", () => {
       renderEntry(entry);
     });
-    entriesLink.appendChild(entryButton);
+    myEntriesDiv.appendChild(entryLink)
   });
+  entriesLink.appendChild(myEntriesDiv);
 }
 
 function renderComments(comments) {
-  commentList.innerHTML = "";
+  commentList.innerText = "";
   comments.forEach(renderComment);
 }
 
@@ -111,7 +116,7 @@ const fetchAllEntries = (callBackFunc) => {
 };
 
 const appendLinksToPage = (entries) => {
-  publicLinks.innerHTML = ""
+  publicLinks.innerText = ""
   const explore = document.createElement('h5')
     explore.textContent = "Explore Public Post!"
   const otherLinksUl = document.createElement("ul");
@@ -130,8 +135,14 @@ const addComment = ({ id }) => {
     if (id === currentLoggedInUserId){
       // debugger
         // query for data set connected to current entry
+
       e.preventDefault();
-      // let post = fetch(`${url}comments`, {config, body: JSON.stringify({comment: document.getElementById('comment').value, user_id: id})});
+
+      const entryConID = parseInt(entryContainer.dataset.entryId)
+      let post = await fetch(`${url}comments`, {...config, body: JSON.stringify({comment: document.getElementById('comment').value, user_id: id, entry_id: entryConID})});
+      let data = await post.json();
+      // debugger
+
       renderComment({
         comment: document.getElementById("comment").value,
         user_id: id,
@@ -274,11 +285,14 @@ logoutLink.addEventListener('click', (e)=>{
   // removing previously logged in user info from DOM
   const cardbodyH5 = document.querySelector('.card-body').querySelector('h5')
   const cardbodyP = document.querySelector('.card-body').querySelector('p')
-  cardbodyH5.innerHTML = ""
-  cardbodyP.innerHTML = ""
-  userInfoContainer.innerHTML = ""
-  entriesLink.innerHTML = ""
-  publicLinks.innerHTML = ""
+  cardbodyH5.innerText = ""
+  cardbodyP.innerText = ""
+  userInfoContainer.innerText = ""
+  myEntriesDiv.innerText = ""
+
+  // entriesLink.removeChild(myEntriesDiv)
+
+  publicLinks.innerText = ""
 
 
 
