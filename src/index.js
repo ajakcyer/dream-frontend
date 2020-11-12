@@ -289,7 +289,7 @@ loginForm.addEventListener("submit", (e) => {
       // sessionStorage.getItem('user_id') = user.id
 
       //function to log in with user id argument
-      logIn(sessionStorage.getItem("user_id"));
+      logIn(user.id);
 
       // hide log in form
       logInDom.style.display = "none";
