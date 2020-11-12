@@ -329,14 +329,8 @@ logoutLink.addEventListener('click', (e)=>{
   // entriesLink.removeChild(myEntriesDiv)
 
   publicLinks.innerText = ""
+  //sessionStorage.removeItem('user_id')
 
-
-
-  // hide log in form
-  logInDom.style.display = ""
-  // sessionStorage.getItem('user_id') = ""
-
-  console.log(sessionStorage.getItem('user_id'))
   // reveal main content after logging in
   // loggedInDom.textContent = ""
   // debugger
@@ -344,6 +338,8 @@ logoutLink.addEventListener('click', (e)=>{
   logInDom.style.display = "none"
   // debugger
   signUpDom.style.display = ""
+
+
 
 })
 
@@ -379,8 +375,9 @@ addPostBtn.addEventListener('click', (e)=>{
     entryCard.style.display = "none"
     postFormDiv.style.display = ""
     console.log("display form here and post button name change")
-
   }
+  
+
 })
 
 
@@ -503,7 +500,6 @@ function init() {
     let id = sessionStorage.getItem('user_id')
     if(id) {
         // signupDom.style.display = 'none'
-        loginForm.style.display = 'none'
         logInDom.style.display = "none"
         signUpDom.style.display = "none"
         logIn(id)
