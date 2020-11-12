@@ -17,3 +17,12 @@ function grab2({body: {data: [,two]}}) {
 }
 
 console.log(grab2(obj));
+
+let headers = {headers: { "content-type": "application/json", accept: "application/json" }}
+
+let config = {
+  method: "POST",
+  ...headers
+};
+
+console.log(config)
