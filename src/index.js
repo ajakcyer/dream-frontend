@@ -55,37 +55,131 @@ async function fetchEntriesComments(id) {
   return data.comments;
 }
 
-const makePublicFetch = (entryIdNum) => {
-  const makePublicConfig = {
-    method: "PATCH",
+// const makePublicFetch = (entryIdNum) => {
+
+//   debugger
+
+//   if (entryIdNum == entryContainer.dataset.entryId){
+
+//     const makePublicConfig = {
+//       method: "PATCH",
+//       ...headers,
+//       body: JSON.stringify({ public: "true" }),
+//     };
+//     fetch(`${url}entries/${entryIdNum}`, makePublicConfig)
+//       .then((r) => r.json())
+//       .then(console.log);
+
+//   }
+// };
+
+const renderUpdatedEntry = (newEntry) =>{
+
+  ///find title links and change name OR delete previous title links
+
+  // const myEntryDiv = document.getElementById('entries-link').querySelector('div')
+  
+  const myEntryTag = entriesLink.querySelector(`p[data-entry-id-num="${newEntry.id}"]`)
+
+
+  renderEntry(newEntry)
+
+  myEntryTag.innerText = newEntry.title;
+  myEntryTag.addEventListener('click', ()=>{
+    renderEntry(newEntry)
+  })
+
+
+  //append as li to ALL post list
+  const myPublicEntryTag = publicLinks.querySelector(`li[data-entry-id-num="${newEntry.id}"]`)
+
+  if (newEntry.public) {
+    if (myPublicEntryTag){
+      myPublicEntryTag.innerText = newEntry.title
+      myPublicEntryTag.addEventListener('click', ()=>{
+        renderEntry(newEntry)
+      })
+    } else {
+      const otherLinksUl = publicLinks.querySelector("ul");
+      const link = createLi(newEntry.title);
+      link.addEventListener("click", () => renderEntry(newEntry));
+      otherLinksUl.append(link);
+    }
+  } else {
+    myPublicEntryTag.remove()
+  }
+
+}
+
+const fetchPatchPost = (id) =>{
+
+  if (postForm["post-title"].value == "") return;
+
+  const updatedEntryBody = {
+    title: postForm["post-title"].value,
+    description: postForm["post-desc"].value,
+    public: postForm.public.checked
+  }
+
+  const entryConfig = {
+    method: 'PATCH',
     ...headers,
-    body: JSON.stringify({ public: "true" }),
-  };
-  fetch(`${url}entries/${entryIdNum}`, makePublicConfig)
-    .then((r) => r.json())
-    .then(console.log);
-};
+    body: JSON.stringify(updatedEntryBody)
+  }
+  debugger
+  fetch(`${url}entries/${id}`, entryConfig)
+  .then(r=>r.json())
+  .then(renderUpdatedEntry)
+
+    postForm.reset()
+    postFormDiv.querySelector('h1').style.display = ""
+    entryCard.style.display = "";
+    updateBtn.style.display = "none"
+    newPostBtn.style.display = ""
+
+}
+
+async function fetchEntry(id) {
+  let response = await fetch(`${url}/entries/${id}`);
+  let data = await response.json();
+  return data;
+}
+
+const updatePost = async (id)=>{
+  // debugger
+    let entry = await fetchEntry(id)
+    //hide entry container
+    entryCard.style.display = "none";
+    //display post form
+    postFormDiv.querySelector('h1').style.display = "none"
+    postFormDiv.style.display = "";
+    postForm["post-title"].value = entry.title
+    postForm["post-desc"].value = entry.description
+    postForm.public.checked = entry.public
+
+    // const updateBtn = postForm.querySelector('.update-btn')
+    // const newPostBtn = postForm.querySelector('.new-post-btn')
+    newPostBtn.style.display = "none"
+    updateBtn.style.display = ""
+
+    updateBtn.addEventListener('click', (e)=>{
+      e.preventDefault()
+      fetchPatchPost(entry.id)
+    })
+}
 
 ///event listener conditionals for buttons on user's entry
 const userBtnEvents = (userBtns, id, user_id) => {
-  const entryIdNum = id;
-  // debugger
   
   userBtns.addEventListener("click", (e) => {
-  if (user_id == sessionStorage.getItem("user_id")) {
+    if ((user_id == sessionStorage.getItem("user_id")) && (id == entryContainer.dataset.entryId)) {
+      const entryIdNum = id;
+      // debugger
       e.preventDefault();
-      if (e.target.matches(".make-public")) {
-        console.log("make public clicked");
-  
-        makePublicFetch(entryIdNum)
-  
-        ///make public patch fetch request function
-      } else if (e.target.matches(".edit-post")) {
+      if (e.target.matches(".edit-post")) {
         console.log("edit post clicked");
-        ///edit post patch fetch request function
-      } else if (e.target.matches(".delete-post")) {
-        console.log("delete button clicked");
-        /// delete post delete fetch request function
+        updatePost(id)
+        ///edit post patch fetch request function /// delete post function
       }
     }}
   );
@@ -139,6 +233,7 @@ function renderEntriesLinks({ entries }) {
   myEntriesDiv.append(myPosts);
   entries.forEach((entry) => {
     let entryLink = createP(entry.title);
+    entryLink.dataset.entryIdNum = entry.id
     entryLink.addEventListener("click", () => {
       renderEntry(entry);
     });
@@ -176,7 +271,11 @@ const appendLinksToPage = (entries) => {
   const otherLinksUl = document.createElement("ul");
   // otherLinksUl.textContent = "Post by Other Users";
   entries.filter(filterPrivatePost).forEach((entry) => {
+    
     const link = createLi(entry.title);
+    if (sessionStorage.getItem('user_id') == entry.user_id){
+      link.dataset.entryIdNum = entry.id
+    }
     link.addEventListener("click", () => renderEntry(entry));
     otherLinksUl.append(link);
   });
@@ -356,6 +455,8 @@ const addPostBtn = document.querySelector(".add-post");
 const entryCard = document.querySelector("#entry-container");
 const postFormDiv = document.querySelector(".myForm");
 const postForm = postFormDiv.querySelector("form");
+const updateBtn = postForm.querySelector('.update-btn')
+const newPostBtn = postForm.querySelector('.new-post-btn')
 
 // event listener on add post btn to open a form for new post
 addPostBtn.addEventListener("click", (e) => {
