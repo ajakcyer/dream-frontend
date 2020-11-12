@@ -52,18 +52,39 @@ async function fetchEntriesComments(id) {
   return data.comments;
 }
 
+
+
+
+///event listener for buttons on user's entry
+
+const thisUserEntry = (user_id) => {
+  const hrTag = document.querySelector('.line')
+  debugger
+  if (currentLoggedInUserId == user_id){
+    const div = document.createElement('div')
+      div.classList.add('node', 'user-btns')
+      div.innerHTML = `<a href="#" class="btn btn-primary node make-public">Go Public</a>
+      <a href="#" class="btn btn-secondary node edit-post">Edit Post</a>
+      <a href="#" class="btn btn-danger node delete-post">Delete Post</a>`
+    hrTag.insertBefore(div)
+  }
+}
+
+
 // loads new post on THIS page when a different post is clicked
 async function renderEntry({ title, description, id, user_id }) {
   let { username, name } = await fetchUser(user_id);
   let comments = await fetchEntriesComments(id);
   entryContainer.dataset.entryId = id
   entryContainer.dataset.userId = user_id
-  let [titleNode, text, button] = entryContainer
+  let [titleNode, text, buttons] = entryContainer
     .querySelector(".card-body")
     .querySelectorAll(".node");
   titleNode.innerText = `${title}: By ${name} Follow ${username}`;
   text.innerText = description;
-  //button add event to go public
+  //button add event to go public / edit post / delete post
+  /// function name here ///
+  thisUserEntry(user_id)
 
   //create data set for entry - override 
   renderComments(comments);
@@ -316,7 +337,7 @@ function closeForm() {
 }
 
 
-// CREATE A POST SECTION!!!
+/////// CREATE A POST SECTION!!! //////
 
 // Variables
 
@@ -343,8 +364,8 @@ addPostBtn.addEventListener('click', (e)=>{
   }
 })
 
-// event listener for submitting new post
 
+// new entry functions to slap to DOM with event listeners
 const newEntryFunc = (newEntry) =>{
   //initial render entry after submitting form
   renderEntry(newEntry)
@@ -375,6 +396,8 @@ const newEntryFunc = (newEntry) =>{
   console.log("entry shown again and button should go back to normal")
 }
 
+
+// event listener for submitting new post
 postForm.addEventListener('submit', (e)=>{
   e.preventDefault()
 
@@ -408,6 +431,35 @@ postForm.addEventListener('submit', (e)=>{
 })
 
 
+///// EDITING POST SECTION /////
+
+//find edit post button a-tag
+const editPostBtn = document.querySelector('.edit-post')
+
+//event listener for btn
+// editPostBtn.addEventListener('click', (e)=>{
+//   e.preventDefault()
+//   console.log("edit post button clicked")
+// })
+
+  //making sure this post is mine (post title comes with entryId and userId) (if currentUserId == userId)
 
 
-// logIn();
+
+/////// END ///////
+
+
+
+
+
+//////// DELETING POST SECTION ///////
+const deletePostBtn = document.querySelector('.delete-post')
+
+// //event listener for btn
+// deletePostBtn.addEventListener('click', (e)=>{
+//   e.preventDefault()
+//   console.log("delete post button clicked")
+// })
+
+
+//// END //////
