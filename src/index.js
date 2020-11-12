@@ -7,11 +7,15 @@ let publicLinks = document.getElementById("other-links");
 let commentList = document.getElementById("comment-list");
 let commentForm = document.getElementById("comment-form");
 let myEntriesDiv = document.createElement("div");
+
+let headers = {headers: { "content-type": "application/json", accept: "application/json" }}
+
 let config = {
   method: "POST",
-  headers: { "content-type": "application/json", accept: "application/json" },
+  ...headers
 };
 
+console.log(config)
 var currentUser;
 // function to create elements with 'element' as argument and string you want inside element as 2nd argument.
 const createElements = (element) => (string) => {
@@ -54,10 +58,7 @@ async function fetchEntriesComments(id) {
 const makePublicFetch = (entryIdNum) => {
   const makePublicConfig = {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    ...headers,
     body: JSON.stringify({ public: "true" }),
   };
   fetch(`${url}entries/${entryIdNum}`, makePublicConfig)
