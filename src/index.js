@@ -6,8 +6,9 @@ let entriesLink = document.getElementById("entries-link");
 let publicLinks = document.getElementById("other-links");
 let commentList = document.getElementById("comment-list");
 let commentForm = document.getElementById("comment-form");
+let myEntriesDiv = document.createElement('div')
 let config = {
-  method: "post",
+  method: "POST",
   headers: { "content-type": "application/json", accept: "application/json" },
 };
 
@@ -31,7 +32,7 @@ const createLi = createElements("li");
 
 //places THIS user's info data on page
 function renderUser(data) {
-  userInfoContainer.innerHTML = ""
+  userInfoContainer.innerText = ""
   let userName = createH1(data.username);
   let name = createH2(data.name);
   let age = createH2(`Age: ${data.age}`);
@@ -51,16 +52,39 @@ async function fetchEntriesComments(id) {
   return data.comments;
 }
 
+
+
+
+///event listener for buttons on user's entry
+
+const thisUserEntry = (user_id) => {
+  const hrTag = document.querySelector('.line')
+  debugger
+  if (currentLoggedInUserId == user_id){
+    const div = document.createElement('div')
+      div.classList.add('node', 'user-btns')
+      div.innerHTML = `<a href="#" class="btn btn-primary node make-public">Go Public</a>
+      <a href="#" class="btn btn-secondary node edit-post">Edit Post</a>
+      <a href="#" class="btn btn-danger node delete-post">Delete Post</a>`
+    hrTag.insertBefore(div)
+  }
+}
+
+
 // loads new post on THIS page when a different post is clicked
 async function renderEntry({ title, description, id, user_id }) {
   let { username, name } = await fetchUser(user_id);
   let comments = await fetchEntriesComments(id);
-  let [titleNode, text, button] = entryContainer
+  entryContainer.dataset.entryId = id
+  entryContainer.dataset.userId = user_id
+  let [titleNode, text, buttons] = entryContainer
     .querySelector(".card-body")
     .querySelectorAll(".node");
   titleNode.innerText = `${title}: By ${name} Follow ${username}`;
   text.innerText = description;
-  //button add event to go public
+  //button add event to go public / edit post / delete post
+  /// function name here ///
+  thisUserEntry(user_id)
 
   //create data set for entry - override 
   renderComments(comments);
@@ -75,21 +99,23 @@ async function renderEntry({ title, description, id, user_id }) {
 
 // fetches THIS user's posts and links them as buttons
 function renderEntriesLinks({ entries }) {
-  entriesLink.innerHTML = ""
+  // entriesLink.innerText = ""
+  // const modalBtn = document.createElement
   const myPosts = document.createElement("h3");
   myPosts.textContent = "My Posts";
-  entriesLink.append(myPosts);
+  myEntriesDiv.append(myPosts);
   entries.forEach((entry) => {
-    let entryButton = createP(entry.title);
-    entryButton.addEventListener("click", () => {
+    let entryLink = createP(entry.title);
+    entryLink.addEventListener("click", () => {
       renderEntry(entry);
     });
-    entriesLink.appendChild(entryButton);
+    myEntriesDiv.appendChild(entryLink)
   });
+  entriesLink.appendChild(myEntriesDiv);
 }
 
 function renderComments(comments) {
-  commentList.innerHTML = "";
+  commentList.innerText = "";
   comments.forEach(renderComment);
 }
 
@@ -111,7 +137,7 @@ const fetchAllEntries = (callBackFunc) => {
 };
 
 const appendLinksToPage = (entries) => {
-  publicLinks.innerHTML = ""
+  publicLinks.innerText = ""
   const explore = document.createElement('h5')
     explore.textContent = "Explore Public Post!"
   const otherLinksUl = document.createElement("ul");
@@ -130,8 +156,14 @@ const addComment = ({ id }) => {
     if (id === currentLoggedInUserId){
       // debugger
         // query for data set connected to current entry
+
       e.preventDefault();
-      // let post = fetch(`${url}comments`, {config, body: JSON.stringify({comment: document.getElementById('comment').value, user_id: id})});
+
+      const entryConID = parseInt(entryContainer.dataset.entryId)
+      let post = await fetch(`${url}comments`, {...config, body: JSON.stringify({comment: document.getElementById('comment').value, user_id: id, entry_id: entryConID})});
+      let data = await post.json();
+      // debugger
+
       renderComment({
         comment: document.getElementById("comment").value,
         user_id: id,
@@ -272,13 +304,16 @@ logoutLink.addEventListener('click', (e)=>{
   e.preventDefault()
 
   // removing previously logged in user info from DOM
-  const cardbodyH5 = document.querySelector('.card-body').querySelector('h5')
-  const cardbodyP = document.querySelector('.card-body').querySelector('p')
-  cardbodyH5.innerHTML = ""
-  cardbodyP.innerHTML = ""
-  userInfoContainer.innerHTML = ""
-  entriesLink.innerHTML = ""
-  publicLinks.innerHTML = ""
+  const cardbodyH5 = entryContainer.querySelector('h5')
+  const cardbodyP = entryContainer.querySelector('p')
+  cardbodyH5.innerText = ""
+  cardbodyP.innerText = ""
+  userInfoContainer.innerText = ""
+  myEntriesDiv.innerText = ""
+
+  // entriesLink.removeChild(myEntriesDiv)
+
+  publicLinks.innerText = ""
 
 
 
@@ -293,5 +328,138 @@ logoutLink.addEventListener('click', (e)=>{
   loggedInDom.style.display = "none"
 })
 
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
 
-// logIn();
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+
+
+/////// CREATE A POST SECTION!!! //////
+
+// Variables
+
+const addPostBtn = document.querySelector('.add-post')
+const entryCard = document.querySelector('#entry-container')
+const postFormDiv = document.querySelector('.myForm')
+const postForm = postFormDiv.querySelector('form')
+
+// event listener on add post btn to open a form for new post
+addPostBtn.addEventListener('click', (e)=>{
+  e.preventDefault()
+
+  if (addPostBtn.innerText == "Cancel"){
+    addPostBtn.innerText = "Add New Post"
+    entryCard.style.display = ""
+    postFormDiv.style.display = "none"
+    console.log("entry shown again and button should go back to normal")
+  } else {
+    addPostBtn.innerText = "Cancel"
+    entryCard.style.display = "none"
+    postFormDiv.style.display = ""
+    console.log("display form here and post button name change")
+
+  }
+})
+
+
+// new entry functions to slap to DOM with event listeners
+const newEntryFunc = (newEntry) =>{
+  //initial render entry after submitting form
+  renderEntry(newEntry)
+  const newEntryTitle = newEntry.title
+
+  // append as p tag to MY post list
+    // if no div section in my entriesLink create one and add it
+  const newEntryTitleP = createP(newEntryTitle)
+
+  myEntriesDiv.append(newEntryTitleP)
+
+  //listener for new entry added to render form when clicked later
+  newEntryTitleP.addEventListener("click", () => {
+    renderEntry(newEntry);
+  });
+
+  //append as li to ALL post list
+  const otherLinksUl = publicLinks.querySelector('ul')
+  const link = createLi(newEntryTitle);
+  link.addEventListener("click", () => renderEntry(newEntry))
+  otherLinksUl.append(link)
+
+  //hide post form and reset contents if successful
+  postForm.reset()
+  addPostBtn.innerText = "Add New Post"
+  entryCard.style.display = ""
+  postFormDiv.style.display = "none"
+  console.log("entry shown again and button should go back to normal")
+}
+
+
+// event listener for submitting new post
+postForm.addEventListener('submit', (e)=>{
+  e.preventDefault()
+
+  const postTitle = postForm['post-title'].value
+  const postDesc = postForm['post-desc'].value
+  const thisUser = currentLoggedInUserId
+  const publicPost = postForm.public.checked
+
+  
+  const newPostObj = {
+    title: postTitle,
+    description: postDesc,
+    user_id: thisUser,
+    public: publicPost
+  }
+  
+  const newPostConfig = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(newPostObj)
+  }
+  
+  fetch(`${url}entries`, newPostConfig)
+  .then(r=>r.json())
+  .then(newEntryFunc)
+
+  // debugger
+})
+
+
+///// EDITING POST SECTION /////
+
+//find edit post button a-tag
+const editPostBtn = document.querySelector('.edit-post')
+
+//event listener for btn
+// editPostBtn.addEventListener('click', (e)=>{
+//   e.preventDefault()
+//   console.log("edit post button clicked")
+// })
+
+  //making sure this post is mine (post title comes with entryId and userId) (if currentUserId == userId)
+
+
+
+/////// END ///////
+
+
+
+
+
+//////// DELETING POST SECTION ///////
+const deletePostBtn = document.querySelector('.delete-post')
+
+// //event listener for btn
+// deletePostBtn.addEventListener('click', (e)=>{
+//   e.preventDefault()
+//   console.log("delete post button clicked")
+// })
+
+
+//// END //////
