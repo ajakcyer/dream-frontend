@@ -92,7 +92,8 @@ const renderUpdatedEntry = (newEntry) =>{
 
   //append as li to ALL post list
   const myPublicEntryTag = publicLinks.querySelector(`li[data-entry-id-num="${newEntry.id}"]`)
-
+  debugger
+  console.log("This Entry Is Public:", newEntry.public)
   if (newEntry.public) {
     if (myPublicEntryTag){
       myPublicEntryTag.innerText = newEntry.title
@@ -102,6 +103,7 @@ const renderUpdatedEntry = (newEntry) =>{
     } else {
       const otherLinksUl = publicLinks.querySelector("ul");
       const link = createLi(newEntry.title);
+      link.dataset.entryIdNum = newEntry.id
       link.addEventListener("click", () => renderEntry(newEntry));
       otherLinksUl.append(link);
     }
