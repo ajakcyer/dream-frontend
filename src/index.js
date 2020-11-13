@@ -147,6 +147,38 @@ async function fetchEntry(id) {
   return data;
 }
 
+const fetchDeletePost = (id) =>{
+
+  const nodes = document.querySelectorAll(`[data-entry-id-num="${id}"]`)
+  if (nodes.length > 0){
+
+    nodes.forEach(node=>{
+      node.remove()})
+
+  
+    // debugger
+  
+    fetch(`${url}entries/${id}`,{method: 'DELETE'})
+    .then(r=>r.json())
+    .then(nothing=>{
+      entryCard.style.display = ""
+      entryCard.classList.add('deleted')
+      postForm.reset()
+      postFormDiv.querySelector('h1').style.display = ""
+      postFormDiv.style.display = "none";
+      newPostBtn.style.display = ""
+      updateBtn.style.display = "none"
+      cancelUpBtn.style.display = "none"
+      deleteBtn.style.display = "none"
+      
+    })
+
+  }
+  
+
+}
+
+
 const updatePost = async (id)=>{
   // debugger
     let entry = await fetchEntry(id)
@@ -164,6 +196,7 @@ const updatePost = async (id)=>{
     newPostBtn.style.display = "none"
     updateBtn.style.display = ""
     cancelUpBtn.style.display = ""
+    deleteBtn.style.display = ""
 
     updateBtn.addEventListener('click', (e)=>{
       e.preventDefault()
@@ -179,6 +212,16 @@ const updatePost = async (id)=>{
       newPostBtn.style.display = ""
       updateBtn.style.display = "none"
       cancelUpBtn.style.display = "none"
+      deleteBtn.style.display = "none"
+
+    })
+
+    deleteBtn.addEventListener('click', (e)=>{
+      e.preventDefault()
+      if (entryContainer.dataset.entryId == entry.id){
+        //delete function
+        fetchDeletePost(entry.id)
+      }
 
     })
 }
@@ -214,6 +257,10 @@ const thisUserEntry = (user_id, id) => {
 
 // loads new post on THIS page when a different post is clicked
 async function renderEntry({ title, description, id, user_id }) {
+  if (entryCard.classList.contains('deleted')){
+    entryCard.classList.remove('deleted')
+  }
+
   let { username, name } = await fetchUser(user_id);
   let comments = await fetchEntriesComments(id);
   entryContainer.dataset.entryId = id;
@@ -472,6 +519,7 @@ const postFormDiv = document.querySelector(".myForm");
 const postForm = postFormDiv.querySelector("form");
 const updateBtn = postForm.querySelector('.update-btn')
 const cancelUpBtn = postForm.querySelector('.cancel-update-btn')
+const deleteBtn = postForm.querySelector('.delete-post-btn')
 const newPostBtn = postForm.querySelector('.new-post-btn')
 
 // event listener on add post btn to open a form for new post

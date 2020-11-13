@@ -107,3 +107,7 @@ html {
   .slider.round:before {
     border-radius: 50%;
   }
+
+  .deleted {
+      background-color: grey;
+  }
