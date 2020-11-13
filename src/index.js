@@ -126,7 +126,7 @@ const fetchPatchPost = (id) =>{
     ...headers,
     body: JSON.stringify(updatedEntryBody)
   }
-  debugger
+  // debugger
   fetch(`${url}entries/${id}`, entryConfig)
   .then(r=>r.json())
   .then(renderUpdatedEntry)
@@ -161,10 +161,23 @@ const updatePost = async (id)=>{
     // const newPostBtn = postForm.querySelector('.new-post-btn')
     newPostBtn.style.display = "none"
     updateBtn.style.display = ""
+    cancelUpBtn.style.display = ""
 
     updateBtn.addEventListener('click', (e)=>{
       e.preventDefault()
       fetchPatchPost(entry.id)
+    })
+
+    cancelUpBtn.addEventListener('click', (e)=>{
+      e.preventDefault()
+      entryCard.style.display = ""
+      postForm.reset()
+      postFormDiv.querySelector('h1').style.display = ""
+      postFormDiv.style.display = "none";
+      newPostBtn.style.display = ""
+      updateBtn.style.display = "none"
+      cancelUpBtn.style.display = "none"
+
     })
 }
 
@@ -456,6 +469,7 @@ const entryCard = document.querySelector("#entry-container");
 const postFormDiv = document.querySelector(".myForm");
 const postForm = postFormDiv.querySelector("form");
 const updateBtn = postForm.querySelector('.update-btn')
+const cancelUpBtn = postForm.querySelector('.cancel-update-btn')
 const newPostBtn = postForm.querySelector('.new-post-btn')
 
 // event listener on add post btn to open a form for new post
