@@ -17,33 +17,60 @@
 
 #entries-link {
     grid-area: myposts ;
+}
+#entries-link ul {
+    overflow-y: scroll;
+    scroll-behavior: auto;
+    height: 350px;
+}
 
+#entries-link li:hover {
+    background-color: aqua;
 }
 
 #entry-container, #form-post-container {
     grid-area: post;
 }
 
+.card-body {
+    max-width: 30vw;
+    min-width: 30vw;
+}
 
 #other-links {
     grid-area: allposts;
 }
 
 #other-links ul {
-    height: 200px;
     overflow-y: scroll;
     scroll-behavior: auto;
+    height: 350px;
 }
+
+
 
 #other-links li:hover {
     background-color: aquamarine;
 }
 
+#comment-list { 
+    overflow-y: scroll;
+    scroll-behavior: auto;
+    max-height: 35vh;
+    max-width: 60vw;
+    align-items: center;
+    border: 5px double #1C95A4;
+border-radius: 13px 32px 30px 0px;
+}
 html {
     margin-left: 2%;
     margin-right: 2%;
 }
 
+.card-text {
+    max-height: 20vh;
+    min-height: 20vh;
+}
 
 /* The switch - the box around the slider */
 .switch {
