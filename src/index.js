@@ -6,16 +6,17 @@ let entriesLink = document.getElementById("entries-link");
 let publicLinks = document.getElementById("other-links");
 let commentList = document.getElementById("comment-list");
 let commentForm = document.getElementById("comment-form");
-let myEntriesDiv = document.createElement("div");
-
-let headers = {headers: { "content-type": "application/json", accept: "application/json" }}
+let myEntriesDiv = document.createElement("div"); // maybe not needed
+let headers = {
+  headers: { "content-type": "application/json", accept: "application/json" },
+};
 
 let config = {
   method: "POST",
-  ...headers
+  ...headers,
 };
 
-console.log(config)
+console.log(config);
 var currentUser;
 // function to create elements with 'element' as argument and string you want inside element as 2nd argument.
 const createElements = (element) => (string) => {
@@ -41,7 +42,12 @@ function renderUser(data) {
   let age = createH2(`Age: ${data.age}`);
   userInfoContainer.append(userName, name, age);
   // console.log(data.entries);
-  if (data.entries.length > 0) renderEntry(data.entries[0]);
+  if (data.entries.length > 0) renderEntry(data.entries[0]); 
+  else { 
+    entryCard.style.display = "none";
+    postFormDiv.style.display = "";
+    document.querySelector(".add-post").innerText = 'Cancel'
+  }
 }
 
 async function fetchUser(id) {
@@ -73,73 +79,71 @@ async function fetchEntriesComments(id) {
 //   }
 // };
 
-const renderUpdatedEntry = (newEntry) =>{
-
+const renderUpdatedEntry = (newEntry) => {
   ///find title links and change name OR delete previous title links
 
   // const myEntryDiv = document.getElementById('entries-link').querySelector('div')
-  
-  const myEntryTag = entriesLink.querySelector(`p[data-entry-id-num="${newEntry.id}"]`)
+  const myEntryTag = entriesLink.querySelector(
+    `li[data-entry-id-num="${newEntry.id}"]`
+  );
 
-
-  renderEntry(newEntry)
+  renderEntry(newEntry);
 
   myEntryTag.innerText = newEntry.title;
-  myEntryTag.addEventListener('click', ()=>{
-    renderEntry(newEntry)
-  })
-
+  myEntryTag.addEventListener("click", () => {
+    renderEntry(newEntry);
+  });
 
   //append as li to ALL post list
-  const myPublicEntryTag = publicLinks.querySelector(`li[data-entry-id-num="${newEntry.id}"]`)
-  debugger
-  console.log("This Entry Is Public:", newEntry.public)
+  const myPublicEntryTag = publicLinks.querySelector(
+    `li[data-entry-id-num="${newEntry.id}"]`
+  );
+
   if (newEntry.public) {
-    if (myPublicEntryTag){
-      myPublicEntryTag.innerText = newEntry.title
-      myPublicEntryTag.addEventListener('click', ()=>{
-        renderEntry(newEntry)
-      })
+    if (myPublicEntryTag) {
+      myPublicEntryTag.innerText = newEntry.title;
+      myPublicEntryTag.addEventListener("click", () => {
+        renderEntry(newEntry);
+      });
     } else {
+      console.log("public", "doesnt exist");
       const otherLinksUl = publicLinks.querySelector("ul");
       const link = createLi(newEntry.title);
-      link.dataset.entryIdNum = newEntry.id
+      link.classList.add("list-group-item");
+      link.dataset.entryIdNum = newEntry.id;
+
       link.addEventListener("click", () => renderEntry(newEntry));
       otherLinksUl.append(link);
     }
   } else {
-    myPublicEntryTag.remove()
+    myPublicEntryTag.remove();
   }
+};
 
-}
-
-const fetchPatchPost = (id) =>{
-
+const fetchPatchPost = (id) => {
   if (postForm["post-title"].value == "") return;
 
   const updatedEntryBody = {
     title: postForm["post-title"].value,
     description: postForm["post-desc"].value,
-    public: postForm.public.checked
-  }
+    public: postForm.public.checked,
+  };
 
   const entryConfig = {
-    method: 'PATCH',
+    method: "PATCH",
     ...headers,
-    body: JSON.stringify(updatedEntryBody)
-  }
-  // debugger
+    body: JSON.stringify(updatedEntryBody),
+  };
   fetch(`${url}entries/${id}`, entryConfig)
-  .then(r=>r.json())
-  .then(renderUpdatedEntry)
+    .then((r) => r.json())
+    .then(renderUpdatedEntry);
 
-    postForm.reset()
-    postFormDiv.querySelector('h1').style.display = ""
-    entryCard.style.display = "";
-    updateBtn.style.display = "none"
-    newPostBtn.style.display = ""
-
-}
+  postForm.reset();
+  postFormDiv.querySelector("h1").style.display = "";
+  entryCard.style.display = "";
+  updateBtn.style.display = "none";
+  newPostBtn.style.display = "";
+};
 
 async function fetchEntry(id) {
   let response = await fetch(`${url}/entries/${id}`);
@@ -228,20 +232,21 @@ const updatePost = async (id)=>{
 
 ///event listener conditionals for buttons on user's entry
 const userBtnEvents = (userBtns, id, user_id) => {
-  
   userBtns.addEventListener("click", (e) => {
-    if ((user_id == sessionStorage.getItem("user_id")) && (id == entryContainer.dataset.entryId)) {
+    if (
+      user_id == sessionStorage.getItem("user_id") &&
+      id == entryContainer.dataset.entryId
+    ) {
       const entryIdNum = id;
       // debugger
       e.preventDefault();
       if (e.target.matches(".edit-post")) {
         console.log("edit post clicked");
-        updatePost(id)
+        updatePost(id);
         ///edit post patch fetch request function /// delete post function
       }
-    }}
-  );
-
+    }
+  });
 };
 
 //button showing conditional statement
@@ -276,7 +281,7 @@ async function renderEntry({ title, description, id, user_id }) {
   // debugger
 
   //create data set for entry - override
-  renderComments(comments);
+  if (comments) renderComments(comments);
 }
 
 // let userName = createH3(user.username)
@@ -292,16 +297,19 @@ function renderEntriesLinks({ entries }) {
   // const modalBtn = document.createElement
   const myPosts = document.createElement("h3");
   myPosts.textContent = "My Posts";
-  myEntriesDiv.append(myPosts);
+  const linksUl = document.createElement("ul");
+  linksUl.classList.add("list-group");
   entries.forEach((entry) => {
-    let entryLink = createP(entry.title);
-    entryLink.dataset.entryIdNum = entry.id
+    let entryLink = createLi(entry.title);
+    entryLink.classList.add("list-group-item");
+    entryLink.dataset.entryIdNum = entry.id;
     entryLink.addEventListener("click", () => {
       renderEntry(entry);
     });
-    myEntriesDiv.appendChild(entryLink);
+    linksUl.append(entryLink);
   });
-  entriesLink.appendChild(myEntriesDiv);
+  console.log;
+  entriesLink.append(myPosts, linksUl);
 }
 
 function renderComments(comments) {
@@ -327,17 +335,22 @@ const fetchAllEntries = (callBackFunc) => {
 };
 
 const appendLinksToPage = (entries) => {
+  //renderPublicEntriesLinks
   publicLinks.innerText = "";
   const explore = document.createElement("h5");
   explore.textContent = "Explore Public Post!";
   const otherLinksUl = document.createElement("ul");
+  otherLinksUl.classList.add("list-group");
   // otherLinksUl.textContent = "Post by Other Users";
   entries.filter(filterPrivatePost).forEach((entry) => {
-    
     const link = createLi(entry.title);
-    if (sessionStorage.getItem('user_id') == entry.user_id){
-      link.dataset.entryIdNum = entry.id
+
+    link.classList.add("list-group-item");
+
+    if (sessionStorage.getItem("user_id") == entry.user_id) {
+      link.dataset.entryIdNum = entry.id;
     }
+
     link.addEventListener("click", () => renderEntry(entry));
     otherLinksUl.append(link);
   });
@@ -349,10 +362,9 @@ const filterPrivatePost = ({ public, user_id }) => public == true; // && user_id
 const addComment = ({ id }) => {
   // debugger
   commentForm.addEventListener("submit", async (e) => {
-    if (id === sessionStorage.getItem("user_id")) {
+    if (id == sessionStorage.getItem("user_id")) {
       // debugger
       // query for data set connected to current entry
-
       e.preventDefault();
 
       const entryConID = parseInt(entryContainer.dataset.entryId);
@@ -366,7 +378,7 @@ const addComment = ({ id }) => {
       });
       let data = await post.json();
       // debugger
-
+      console.log(data);
       renderComment({
         comment: document.getElementById("comment").value,
         user_id: id,
@@ -418,9 +430,10 @@ signupForm.addEventListener("submit", (e) => {
       signUpDom.style.display = "none";
       // debugger
       // render your first entry (if you ha)
-      logIn(sessionStorage.getItem("user_id"));
-    })
-    .then(saveUserSession);
+      console.log(newUser);
+      logIn(newUser.id);
+      saveUserSession(newUser);
+    });
 });
 
 //// LOG IN SECTION ///
@@ -485,12 +498,13 @@ logoutLink.addEventListener("click", (e) => {
   cardbodyH5.innerText = "";
   cardbodyP.innerText = "";
   userInfoContainer.innerText = "";
-  myEntriesDiv.innerText = "";
+  entriesLink.querySelector('ul').innerText = "";
+  entriesLink.querySelector('h3').innerText = "";
 
   // entriesLink.removeChild(myEntriesDiv)
 
   publicLinks.innerText = "";
-  sessionStorage.removeItem('user_id')
+  sessionStorage.removeItem("user_id");
 
   // reveal main content after logging in
   // loggedInDom.textContent = ""
@@ -543,24 +557,30 @@ addPostBtn.addEventListener("click", (e) => {
 const newEntryFunc = (newEntry) => {
   //initial render entry after submitting form
   renderEntry(newEntry);
-  const newEntryTitle = newEntry.title;
 
   // append as p tag to MY post list
   // if no div section in my entriesLink create one and add it
-  const newEntryTitleP = createP(newEntryTitle);
-
-  myEntriesDiv.append(newEntryTitleP);
-
+  const newEntryTitle = createLi(newEntry.title);
+  newEntryTitle.classList.add("list-group-item");
+  const entriesUl = entriesLink.querySelector("ul");
+  if (entriesUl) {
+    entriesLink.querySelector("ul").append(newEntryTitle);
+  } else {
+    const ul = document.createElement("ul");
+    ul.append(newEntryTitle)
+    entriesLink.append(ul)
+  }
   //listener for new entry added to render form when clicked later
-  
-  newEntryTitleP.addEventListener("click", () => {
+
+  newEntryTitle.addEventListener("click", () => {
     renderEntry(newEntry);
-  }); // generalize to function 
+  }); // generalize to function
 
   //append as li to ALL post list
   if (newEntry.public) {
     const otherLinksUl = publicLinks.querySelector("ul");
-    const link = createLi(newEntryTitle);
+    const link = createLi(newEntry.title);
+    link.classList.add("list-group-item");
     link.addEventListener("click", () => renderEntry(newEntry));
     otherLinksUl.append(link);
   }
@@ -643,6 +663,7 @@ function logIn(id) {
       fetchAllEntries(appendLinksToPage);
       addComment(data);
     });
+  return;
 }
 
 function init() {
