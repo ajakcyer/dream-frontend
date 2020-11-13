@@ -16,7 +16,6 @@ let config = {
   ...headers,
 };
 
-console.log(config);
 var currentUser;
 // function to create elements with 'element' as argument and string you want inside element as 2nd argument.
 const createElements = (element) => (string) => {
@@ -333,11 +332,42 @@ function renderComments(comments) {
   comments.forEach(renderComment);
 }
 
-async function renderComment({ comment, user_id }) {
+const deleteCommentFetch = (id) =>{
+
+  const commentNode = commentList.querySelector(`[data-comment-id="${id}"]`)
+  const commentP = commentNode.nextSibling
+  // debugger
+
+
+  fetch(`${url}comments/${id}`,{method: 'DELETE'})
+  .then(r=>r.json())
+  .then(nothing=>{
+    console.log(nothing)
+    commentNode.remove()
+    commentP.remove()
+  })
+
+}
+
+
+
+async function renderComment({ comment, user_id, id }) {
   let { username, name } = await fetchUser(user_id);
   let user_name = createP(`${username} ${name}`);
   let commentNode = createLi(comment);
   commentNode.classList.add("list-group-item");
+  if (sessionStorage.getItem("user_id") == user_id) {
+    commentNode.dataset.commentId = id;
+    const deleteCommentBtn = createButton("delete")
+    deleteCommentBtn.classList.add('myDeleteButton')
+    //delete comment function
+    commentNode.append(deleteCommentBtn)
+    deleteCommentBtn.addEventListener('click', (e)=>{
+      e.preventDefault()
+      // console.log("this is comment", e.target.parentNode, id)
+      deleteCommentFetch(id)
+    })
+  }
   commentList.append(commentNode, user_name);
 }
 
@@ -398,6 +428,7 @@ const addComment = ({ id }) => {
       renderComment({
         comment: document.getElementById("comment").value,
         user_id: id,
+        id: data.id
       });
     }
   });
@@ -675,7 +706,7 @@ function saveUserSession({ id }) {
 function logIn(id) {
   // reveal main content after logging in
   loggedInDom.style.display = ""; //visible
-  console.log(id);
+  // console.log(id);
   fetch(`${url}/users/${id}`)
     .then((r) => r.json())
     .then((data) => {

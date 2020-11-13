@@ -89,7 +89,7 @@ body {
     min-height: 40vh;
     max-width: 60vw;
     /* align-items: center; */
-    border: 5px double #1C95A4;
+    border: 30px double #1C95A4;
     border-radius: 13px 32px 30px 0px;
 }
 
@@ -225,4 +225,31 @@ html {
 
 #entries-link, #other-links {
     margin-left: 5vw;
+}
+
+
+/* delete */
+
+.myDeleteButton {
+    box-shadow:inset -24px 1px 0px -26px #f29c93;
+    background:linear-gradient(to bottom, #fe1a00 5%, #ce0100 100%);
+    background-color:#fe1a00;
+    border-radius:8px;
+    border:3px solid #000000;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Trebuchet MS;
+    font-size:10px;
+    font-weight:bold;
+    padding:0px 5px;
+    text-decoration:none;
+    text-shadow:2px 0px 0px #b23e35;
+    position: absolute;
+    right: 15px;
+}
+
+.myDeleteButton:hover {
+    background:linear-gradient(to bottom, #ce0100 5%, #fe1a00 100%);
+    background-color:#ce0100;
 }
