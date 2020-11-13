@@ -532,7 +532,7 @@ logoutLink.addEventListener("click", (e) => {
 
   entryCard.style.display = "";
   postFormDiv.style.display = "none";
-  document.querySelector(".add-post").innerText = 'Cancel'
+  // document.querySelector(".add-post").innerText = 'Cancel'
 });
 
 // function openForm() {
