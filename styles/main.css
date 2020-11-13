@@ -1,3 +1,8 @@
+body {
+    background: rgb(2,0,36);
+    background: radial-gradient(circle, rgba(2,0,36,1) 30%, rgba(72,9,121,1) 80%, rgba(17,1,182,1) 100%);
+}
+
 #main-container {
     display: grid;
  grid-template-areas:
@@ -10,14 +15,22 @@
 
 #user-info-container {
     grid-area: header;
-    display: inline-flex;
+    display: inline-block;
     background: cyan;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    /* font-size: 20px; */
 
 }
 
 #entries-link {
     grid-area: myposts ;
 }
+
+#entries-link h3, #other-links h5{
+    color: white;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
 #entries-link ul {
     overflow-y: scroll;
     scroll-behavior: auto;
@@ -66,16 +79,25 @@ border-radius: 13px 32px 30px 0px;
 
 #comment-list:empty::after {
     content: attr(placeholder);
-  }
+}
+
+
+.card-paragraph {
+    overflow-y: scroll;
+    scroll-behavior: auto;
+    max-height: 35vh;
+    min-height: 35vh
+}
+
 html {
     margin-left: 2%;
     margin-right: 2%;
 }
 
-.card-text {
+/* .card-text {
     max-height: 20vh;
     min-height: 20vh;
-}
+} */
 
 /* The switch - the box around the slider */
 .switch {
@@ -143,3 +165,22 @@ html {
   .deleted, .deleted li {
       background-color: grey;
   }
+
+
+
+  .alignleft {
+	float: left;
+}
+.alignright {
+    float: right;
+    position: relative;
+    top: 12px;
+}
+
+#signup-form label, #signup-form h2, #login-form label, #login-form h2 {
+    color: white;
+}
+
+.nav-link {
+    color: white;
+}

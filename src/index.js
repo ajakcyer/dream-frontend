@@ -38,8 +38,11 @@ const createLi = createElements("li");
 function renderUser(data) {
   userInfoContainer.innerText = "";
   let userName = createH1(data.username);
+    userName.classList.add('alignleft')
   let name = createH2(data.name);
+    name.classList.add('alignright')
   let age = createH2(`Age: ${data.age}`);
+    age.classList.add('alignright')
   userInfoContainer.append(userName, name, age);
   // console.log(data.entries);
   if (data.entries.length > 0) renderEntry(data.entries[0]); 
@@ -526,6 +529,10 @@ logoutLink.addEventListener("click", (e) => {
   logInDom.style.display = "none";
   // debugger
   signUpDom.style.display = "";
+
+  entryCard.style.display = "";
+  postFormDiv.style.display = "none";
+  document.querySelector(".add-post").innerText = 'Cancel'
 });
 
 // function openForm() {
