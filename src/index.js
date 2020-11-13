@@ -87,6 +87,8 @@ const renderUpdatedEntry = (newEntry) => {
     `li[data-entry-id-num="${newEntry.id}"]`
   );
 
+  // debugger
+
   renderEntry(newEntry);
 
   myEntryTag.innerText = newEntry.title;
@@ -142,6 +144,7 @@ const fetchPatchPost = (id) => {
   postFormDiv.querySelector("h1").style.display = "";
   entryCard.style.display = "";
   updateBtn.style.display = "none";
+  deleteBtn.style.display = "none"
   newPostBtn.style.display = "";
 };
 
@@ -167,6 +170,8 @@ const fetchDeletePost = (id) =>{
     .then(nothing=>{
       entryCard.style.display = ""
       entryCard.classList.add('deleted')
+      entryCard.querySelector('textarea').classList.add('deleted')
+      commentList.classList.add('deleted')
       postForm.reset()
       postFormDiv.querySelector('h1').style.display = ""
       postFormDiv.style.display = "none";
@@ -174,6 +179,8 @@ const fetchDeletePost = (id) =>{
       updateBtn.style.display = "none"
       cancelUpBtn.style.display = "none"
       deleteBtn.style.display = "none"
+      editPostBtn.style.display = "none";
+      commentForm.querySelector('button').disabled = true;
       
     })
 
@@ -204,7 +211,9 @@ const updatePost = async (id)=>{
 
     updateBtn.addEventListener('click', (e)=>{
       e.preventDefault()
-      fetchPatchPost(entry.id)
+      if (entryContainer.dataset.entryId == entry.id){
+        fetchPatchPost(entry.id)
+      }
     })
 
     cancelUpBtn.addEventListener('click', (e)=>{
@@ -264,6 +273,10 @@ const thisUserEntry = (user_id, id) => {
 async function renderEntry({ title, description, id, user_id }) {
   if (entryCard.classList.contains('deleted')){
     entryCard.classList.remove('deleted')
+    entryCard.querySelector('textarea').classList.remove('deleted')
+    commentList.classList.remove('deleted')
+    editPostBtn.style.display = "";
+    commentForm.querySelector('button').disabled = false;
   }
 
   let { username, name } = await fetchUser(user_id);
@@ -498,8 +511,8 @@ logoutLink.addEventListener("click", (e) => {
   cardbodyH5.innerText = "";
   cardbodyP.innerText = "";
   userInfoContainer.innerText = "";
-  entriesLink.querySelector('ul').innerText = "";
-  entriesLink.querySelector('h3').innerText = "";
+  entriesLink.querySelector('ul').remove();
+  entriesLink.querySelector('h3').remove();
 
   // entriesLink.removeChild(myEntriesDiv)
 
@@ -562,6 +575,7 @@ const newEntryFunc = (newEntry) => {
   // if no div section in my entriesLink create one and add it
   const newEntryTitle = createLi(newEntry.title);
   newEntryTitle.classList.add("list-group-item");
+  newEntryTitle.dataset.entryIdNum = newEntry.id
   const entriesUl = entriesLink.querySelector("ul");
   if (entriesUl) {
     entriesLink.querySelector("ul").append(newEntryTitle);
@@ -581,6 +595,7 @@ const newEntryFunc = (newEntry) => {
     const otherLinksUl = publicLinks.querySelector("ul");
     const link = createLi(newEntry.title);
     link.classList.add("list-group-item");
+    link.dataset.entryIdNum = newEntry.id
     link.addEventListener("click", () => renderEntry(newEntry));
     otherLinksUl.append(link);
   }

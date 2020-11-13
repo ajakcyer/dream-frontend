@@ -57,11 +57,16 @@
     overflow-y: scroll;
     scroll-behavior: auto;
     max-height: 35vh;
+    min-height: 35vh;
     max-width: 60vw;
     align-items: center;
     border: 5px double #1C95A4;
 border-radius: 13px 32px 30px 0px;
 }
+
+#comment-list:empty::after {
+    content: attr(placeholder);
+  }
 html {
     margin-left: 2%;
     margin-right: 2%;
@@ -135,6 +140,6 @@ html {
     border-radius: 50%;
   }
 
-  .deleted {
+  .deleted, .deleted li {
       background-color: grey;
   }
