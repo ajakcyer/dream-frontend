@@ -36,13 +36,13 @@ const createLi = createElements("li");
 //places THIS user's info data on page
 function renderUser(data) {
   userInfoContainer.innerText = "";
-  let userName = createH1(data.username);
+  let userName = createH1(`${data.username}`);
     userName.classList.add('alignleft')
-  let name = createH2(data.name);
+  let name = createH2(`Hello, ${data.name}! 🌛`);
     name.classList.add('alignright')
-  let age = createH2(`Age: ${data.age}`);
-    age.classList.add('alignright')
-  userInfoContainer.append(userName, name, age);
+  // let age = createH2(`Age: ${data.age}`);
+  //   age.classList.add('alignright')
+  userInfoContainer.append(userName, name);
   // console.log(data.entries);
   if (data.entries.length > 0) renderEntry(data.entries[0]); 
   else { 
@@ -120,7 +120,9 @@ const renderUpdatedEntry = (newEntry) => {
       otherLinksUl.append(link);
     }
   } else {
-    myPublicEntryTag.remove();
+    if (myPublicEntryTag){
+      myPublicEntryTag.remove();
+    }
   }
 };
 
@@ -143,6 +145,7 @@ const fetchPatchPost = (id) => {
     .then(renderUpdatedEntry);
 
   postForm.reset();
+  postFormDiv.style.display = "none"
   postFormDiv.querySelector("h1").style.display = "";
   entryCard.style.display = "";
   updateBtn.style.display = "none";
@@ -288,7 +291,7 @@ async function renderEntry({ title, description, id, user_id }) {
   let [titleNode, text, buttons] = entryContainer
     .querySelector(".card-body")
     .querySelectorAll(".node");
-  titleNode.innerText = `${title}: By ${name} Follow ${username}`;
+  titleNode.innerHTML = `${title} <br>By: ${username}`;
   text.innerText = description;
   //button add event to go public / edit post / delete post
   /// function name here ///
@@ -311,7 +314,7 @@ function renderEntriesLinks({ entries }) {
   // entriesLink.innerText = ""
   // const modalBtn = document.createElement
   const myPosts = document.createElement("h3");
-  myPosts.textContent = "My Posts";
+  myPosts.textContent = "My Dreams 💤💤💤";
   const linksUl = document.createElement("ul");
   linksUl.classList.add("list-group");
   entries.forEach((entry) => {
@@ -353,7 +356,7 @@ const deleteCommentFetch = (id) =>{
 
 async function renderComment({ comment, user_id, id }) {
   let { username, name } = await fetchUser(user_id);
-  let user_name = createP(`${username} ${name}`);
+  let user_name = createP(`${username}`);
   let commentNode = createLi(comment);
   commentNode.classList.add("list-group-item");
   if (sessionStorage.getItem("user_id") == user_id) {
@@ -431,6 +434,7 @@ const addComment = ({ id }) => {
         id: data.id
       });
     }
+    commentForm.reset()
   });
 };
 
