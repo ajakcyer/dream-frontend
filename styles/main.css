@@ -16,7 +16,7 @@ body {
 #user-info-container {
     grid-area: header;
     display: inline-block;
-    background: cyan;
+    background-color: rgba(255, 255, 255, 0.5);
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     /* font-size: 20px; */
 
